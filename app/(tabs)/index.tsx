@@ -1,98 +1,165 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { Link } from 'expo-router';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
+import { BraidPreview } from '@/components/braid-preview';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import { braidStyles } from '@/constants/braids';
 
 export default function HomeScreen() {
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+    <ThemedView style={styles.screen}>
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <ThemedView style={styles.hero} lightColor="#ffffff" darkColor="#ffffff">
+          <ThemedText style={styles.eyebrow}>Style Catalog</ThemedText>
+          <ThemedText type="title" style={styles.title}>
+            Braidy
+          </ThemedText>
+          <ThemedText style={styles.subtitle}>
+            Browse braid ideas with color combinations and quick visual previews.
+          </ThemedText>
+        </ThemedView>
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+        <ThemedView style={styles.listSection}>
+          {braidStyles.map((style) => (
+            <Link key={style.slug} href={`/braids/${style.slug}`} asChild>
+              <Pressable style={({ pressed }) => [styles.cardPressable, pressed && styles.cardPressed]}>
+                <ThemedView
+                  style={styles.card}
+                  lightColor="#ffffff"
+                  darkColor="#ffffff">
+                  <BraidPreview colors={style.preview} />
+                  <View style={styles.cardContent}>
+                    <ThemedText type="subtitle" style={styles.cardTitle}>
+                      {style.name}
+                    </ThemedText>
+                    <ThemedText style={styles.description}>{style.description}</ThemedText>
+                    <View style={styles.metaRow}>
+                      <ThemedText style={styles.metaText}>Sizes: Small, Medium, Large</ThemedText>
+                      <ThemedText style={styles.metaText}>Tap to customize</ThemedText>
+                    </View>
+                    <View style={styles.colorRow}>
+                      {style.colors.slice(0, 3).map((color) => (
+                        <View key={`${style.name}-${color.code}`} style={styles.colorChipWrap}>
+                          <View style={[styles.colorDot, { backgroundColor: color.swatch }]} />
+                          <ThemedText style={styles.colorLabel}>{color.code}</ThemedText>
+                        </View>
+                      ))}
+                    </View>
+                  </View>
+                </ThemedView>
+              </Pressable>
+            </Link>
+          ))}
+        </ThemedView>
+      </ScrollView>
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  screen: {
+    flex: 1,
+  },
+  content: {
+    paddingHorizontal: 20,
+    paddingTop: 24,
+    paddingBottom: 40,
+    gap: 18,
+  },
+  hero: {
+    borderRadius: 28,
+    paddingHorizontal: 22,
+    paddingVertical: 24,
+    gap: 10,
+    borderWidth: 2,
+    borderColor: '#efbfd3',
+    backgroundColor: '#ffffff',
+  },
+  eyebrow: {
+    textTransform: 'uppercase',
+    letterSpacing: 1.4,
+    fontSize: 12,
+    lineHeight: 16,
+    fontWeight: '700',
+    color: '#df7fa8',
+  },
+  title: {
+    fontSize: 42,
+    lineHeight: 44,
+  },
+  subtitle: {
+    fontSize: 17,
+    lineHeight: 25,
+    maxWidth: 520,
+  },
+  listSection: {
+    gap: 14,
+  },
+  cardPressable: {
+    borderRadius: 24,
+  },
+  cardPressed: {
+    opacity: 0.92,
+    transform: [{ scale: 0.992 }],
+  },
+  card: {
+    borderRadius: 24,
+    padding: 16,
+    flexDirection: 'row',
+    gap: 16,
+    borderWidth: 2,
+    borderColor: '#efbfd3',
+    backgroundColor: '#ffffff',
+  },
+  cardContent: {
+    flex: 1,
+    gap: 8,
+    justifyContent: 'center',
+  },
+  cardTitle: {
+    fontSize: 22,
+  },
+  description: {
+    fontSize: 15,
+    lineHeight: 22,
+  },
+  metaRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  metaText: {
+    fontSize: 13,
+    lineHeight: 18,
+    fontWeight: '600',
+    color: '#cf6f99',
+  },
+  colorRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    marginTop: 4,
+  },
+  colorChipWrap: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 999,
+    backgroundColor: '#fff6fa',
+    borderWidth: 2,
+    borderColor: '#f1c7d8',
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  colorDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 999,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  colorLabel: {
+    fontSize: 13,
+    lineHeight: 18,
+    fontWeight: '600',
   },
 });
